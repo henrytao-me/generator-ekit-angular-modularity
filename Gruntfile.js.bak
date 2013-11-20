@@ -293,8 +293,7 @@ module.exports = function(grunt) {
         'copy:dist',
 
         'useminPrepare',
-        'concurrent:dist',              // 'imagemin', 'svgmin', 'htmlmin', 'ngmin', 'cssmin'
-        'uglify',
+        'concurrent:dist',              // 'imagemin', 'svgmin', 'htmlmin', 'ngmin', // 'cssmin', 'uglify'        
         'rev', 
         'usemin']);
 
