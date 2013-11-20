@@ -1,0 +1,27 @@
+{
+    "name": "bower-twittstrap",
+    "version": "0.0.2",
+    "description": "bower twittstrap using less (Twittstrap version 0.2 || Built with Twitter Bootstrap Version 2.3.2)",
+    "main": "index.js",
+    "dependencies": {},
+    "devDependencies": {
+        "grunt": "~0.4.1",
+        "grunt-contrib-copy": "~0.4.1",
+        "grunt-contrib-less": "~0.8.2",
+        "grunt-contrib-cssmin": "~0.7.0",
+        "load-grunt-tasks": "~0.2.0"        
+    },
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/henrytao-me/bower-twittstrap.git"
+    },
+    "keywords": ["ekit", "bower", "twittrap", "less", "twitter", "bootstrap"],
+    "author": "Henry Tao",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/henrytao-me/bower-twittstrap/issues"
+    }
+}

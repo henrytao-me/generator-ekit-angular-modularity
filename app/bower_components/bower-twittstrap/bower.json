@@ -1,0 +1,11 @@
+{
+    "name": "bower-twittstrap",
+    "main": "index.js",
+    "version": "0.0.2",
+    "homepage": "https://github.com/henrytao-me/bower-twittstrap",
+    "authors": ["Henry Tao <hi@henrytao.me>"],
+    "description": "bower twittstrap using less (Twittstrap version 0.2 || Built with Twitter Bootstrap Version 2.3.2)",
+    "license": "MIT",
+    "keywords": ["ekit", "bower", "twittrap", "less", "twitter", "bootstrap"],
+    "ignore": ["**/.*", "node_modules", "bower_components"]
+}
