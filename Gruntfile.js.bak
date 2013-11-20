@@ -260,7 +260,30 @@ module.exports = function(grunt) {
             return grunt.task.run(['build', 'env:dist', 'express:dist', 'express-keepalive']);
         };
 
-        grunt.task.run(['clean:server', 'concurrent:server', 'autoprefixer', 'env:dev', 'express:dev', 'open', 'watch']);
+        grunt.task.run([
+            'clean:server', 
+            'concurrent:copy',              // 'copy:themes', 'copy:common', 'copy:addon'
+            'concurrent:server',            // 'less:themes', 'less:common', 'less.addon'
+            'concat:themes',
+            'concat:common_styles',
+            'concat:common_scripts',
+            'concat:addon_styles',
+            'concat:addon_scripts',
+            'autoprefixer',
+            'env:dev', 
+            'express:dev', 
+            'open', 
+            'watch'                         
+            
+
+            'concurrent:copy'               'copy:themes', 'copy:styles', 'copy:common', 'copy:addon', 'less'
+            'concurrent:server',            'concat:themes', 'concat:styles', 'concat:scripts', 
+            'autoprefixer',
+            'concat',
+            'env:dev', 
+            'express:dev', 
+            'open', 
+            'watch']);
     });
 
     grunt.registerTask('test', ['clean:server', 'concurrent:test', 'autoprefixer', 'connect:test', 'karma']);

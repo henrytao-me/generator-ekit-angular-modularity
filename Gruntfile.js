@@ -21,32 +21,158 @@ module.exports = function(grunt) {
             themeDir: 'themes/default'
         },
         watch: {
-            coffee: {
-                files: ['<%= yeoman.app %>/scripts/{,*/}*.coffee'],
-                tasks: ['coffee:dist']
+            themes: {
+                files: ['<%= yeoman.app %>/<%= yeoman.themeDir %>/**/*.{css,less}'],
+                tasks: ['copy:themes', 'less:themes', 'concat:themes']
             },
-            coffeeTest: {
-                files: ['test/spec/{,*/}*.coffee'],
-                tasks: ['coffee:test']
+            common_styles: {
+                files: ['<%= yeoman.app %>/<%= yeoman.common %>/**/*.{css,less}'],
+                tasks: ['copy:common', 'less:common', 'concat:common_styles']
             },
-            less: {
-                files: ['<%= yeoman.app %>/styles/{,*/}*.less'],
-                tasks: ['less', 'autoprefixer']
+            common_scripts: {
+                files: ['<%= yeoman.app %>/<%= yeoman.common %>/**/*.js'],
+                tasks: ['copy:common', 'less:common', 'concat:common_scripts']
             },
-            styles: {
-                files: ['<%= yeoman.app %>/styles/{,*/}*.css'],
-                tasks: ['copy:styles', 'autoprefixer']
+            addon_styles: {
+                files: ['<%= yeoman.app %>/<%= yeoman.addon %>/**/*.{css,less}'],
+                tasks: ['copy:addon', 'less:addon', 'concat:addon_styles']
+            },
+            addon_scripts: {
+                files: ['<%= yeoman.app %>/<%= yeoman.addon %>/**/*.js'],
+                tasks: ['copy:addon', 'less:addon', 'concat:addon_scripts']
             }
+        },
+        clean: {
+            dist: {
+                files: [{
+                    dot: true,
+                    src: ['.tmp', '<%= yeoman.dist %>/*', '!<%= yeoman.dist %>/.git*']
+                }]
+            },
+            server: '.tmp'
+        },
+        concurrent: {
+            copy: ['copy:themes', 'copy:common', 'copy:addon'],
+            server: ['less:themes', 'less:common', 'less:addon'],
+            // test: ['coffee', 'less', 'copy:styles'],
+            // dist: ['coffee', 'less', 'copy:styles', 'imagemin', 'svgmin', 'htmlmin']
+        },
+        copy: {
+            // dist: {
+            //     files: [{
+            //         expand: true,
+            //         dot: true,
+            //         cwd: '<%= yeoman.app %>',
+            //         dest: '<%= yeoman.dist %>',
+            //         src: ['*.{ico,png,txt}', '.htaccess', 'bower_components/**/*', 'images/{,*/}*.{gif,webp}', 'styles/fonts/*']
+            //     }, {
+            //         expand: true,
+            //         cwd: '.tmp/images',
+            //         dest: '<%= yeoman.dist %>/images',
+            //         src: ['generated/*']
+            //     }]
+            // },
+            themes: {
+                files: [{
+                    expand: true,
+                    cwd: '<%= yeoman.app %>/<%= yeoman.themeDir %>',
+                    src: ['**/*.*', '!**/*.less', '!**/*.css'],
+                    dest: '.tmp/themes/'
+                },  {
+                    expand: true,
+                    cwd: '<%= yeoman.app %>/<%= yeoman.themeDir %>',
+                    src: ['**/*.css'],
+                    dest: '.tmp/themes/.tmp/themes/'
+                }]
+            },
+            common: {
+                files: [{
+                    expand: true,
+                    cwd: '<%= yeoman.app %>/<%= yeoman.common %>',
+                    src: ['**/*.css'],
+                    dest: '.tmp/styles/.tmp/common/'
+                }, {
+                    expand: true,
+                    cwd: '<%= yeoman.app %>/<%= yeoman.common %>',
+                    src: ['**/*.js'],
+                    dest: '.tmp/scripts/.tmp/common'
+                }]
+            },
+            addon: {
+                files: [{
+                    expand: true,
+                    cwd: '<%= yeoman.app %>/<%= yeoman.addon %>',
+                    src: ['**/*.css'],
+                    dest: '.tmp/styles/.tmp/addon/'
+                }, {
+                    expand: true,
+                    cwd: '<%= yeoman.app %>/<%= yeoman.addon %>',
+                    src: ['**/*.js'],
+                    dest: '.tmp/scripts/.tmp/addon/'
+                }]
+            }
+        },
+        less: {
+            themes: {
+                files: {
+                    '.tmp/themes/.tmp/css.css': ['<%= yeoman.app %>/<%= yeoman.themeDir %>/css.less']
+                }
+            },
+            common: {
+                files: {
+                    '.tmp/styles/.tmp/common.css': ['<%= yeoman.app %>/<%= yeoman.common %>/*/*/css.less']
+                }
+            },
+            addon: {
+                files: {
+                    '.tmp/styles/.tmp/addon.css': ['<%= yeoman.app %>/<%= yeoman.addon %>/*/css.less']
+                }
+            }
+        },
+        concat: {
+            themes: {
+                separator: ' ',
+                src: ['.tmp/themes/.tmp/*.css', '.tmp/themes/.tmp/themes/**/*.css'],
+                dest: '.tmp/themes/css.css'
+            },
+            common_styles: {
+                separator: ' ',
+                src: ['.tmp/styles/.tmp/common.css', '.tmp/styles/.tmp/common/**/*.css'],
+                dest: '.tmp/styles/common.css'
+            },
+            addon_styles: {
+                separator: ' ',
+                src: ['.tmp/styles/.tmp/addon.css', '.tmp/styles/.tmp/addon/**/*.css'],
+                dest: '.tmp/styles/addon.css'
+            },
+            common_scripts: {
+                separator: ';',
+                src: ['.tmp/scripts/.tmp/common/**/*.js'],
+                dest: '.tmp/scripts/common.js'
+            },
+            addon_scripts: {
+                separator: ';',
+                src: ['.tmp/scripts/.tmp/addon/**/*.js'],
+                dest: '.tmp/scripts/addon.js'
+            },
         },
         autoprefixer: {
             options: ['last 1 version'],
+            // dist: {
+            //     files: [{
+            //         expand: true,
+            //         cwd: '.tmp/styles/',
+            //         src: '**/*.css',
+            //         dest: '.tmp/styles/'
+            //     }]
+            // }
+        },
+        env: {
+            dev: {
+                NODE_ENV: 'development'
+            },
             dist: {
-                files: [{
-                    expand: true,
-                    cwd: '.tmp/styles/',
-                    src: '{,*/}*.css',
-                    dest: '.tmp/styles/'
-                }]
+                NODE_ENV: 'production'
             }
         },
         express: {
@@ -57,7 +183,7 @@ module.exports = function(grunt) {
             dev: {
                 options: {
                     // static directory or watching directory
-                    bases: ['.tmp', '<%= yeoman.app %>'],
+                    bases: ['.tmp', '<%= yeoman.app %>/<%= yeoman.addon %>', '<%= yeoman.app %>'],
                     livereload: 35730,
                     server: 'app.js'
                 }
@@ -70,65 +196,42 @@ module.exports = function(grunt) {
                 }
             }
         },
-        env: {
-            dev: {
-                NODE_ENV: 'development'
-            },
-            dist: {
-                NODE_ENV: 'production'
-            }
-        },
         open: {
             server: {
                 url: 'http://127.0.0.1:<%= express.options.port %>'
             }
         },
-        clean: {
-            dist: {
-                files: [{
-                    dot: true,
-                    src: ['.tmp', '<%= yeoman.dist %>/*', '!<%= yeoman.dist %>/.git*']
-                }]
-            },
-            server: '.tmp'
-        },
+
+
+
+
+
+       
+        
+        
+        
+
+        
+
+
+
+
+
+
+
+
+
+
+
+        
+        
         jshint: {
             options: {
                 jshintrc: '.jshintrc'
             },
             all: ['Gruntfile.js', '<%= yeoman.app %>/scripts/{,*/}*.js']
         },
-        coffee: {
-            options: {
-                sourceMap: true,
-                sourceRoot: ''
-            },
-            dist: {
-                files: [{
-                    expand: true,
-                    cwd: '<%= yeoman.app %>/scripts',
-                    src: '{,*/}*.coffee',
-                    dest: '.tmp/scripts',
-                    ext: '.js'
-                }]
-            },
-            test: {
-                files: [{
-                    expand: true,
-                    cwd: 'test/spec',
-                    src: '{,*/}*.coffee',
-                    dest: '.tmp/spec',
-                    ext: '.js'
-                }]
-            }
-        },
-        less: {
-            styles: {
-                files: {
-                    '.tmp/styles/main.css': '<%= yeoman.app %>/styles/main.less'
-                }
-            }
-        },
+        
         rev: {
             dist: {
                 files: {
@@ -204,33 +307,8 @@ module.exports = function(grunt) {
             }
         },
         // Put files not handled in other tasks here
-        copy: {
-            dist: {
-                files: [{
-                    expand: true,
-                    dot: true,
-                    cwd: '<%= yeoman.app %>',
-                    dest: '<%= yeoman.dist %>',
-                    src: ['*.{ico,png,txt}', '.htaccess', 'bower_components/**/*', 'images/{,*/}*.{gif,webp}', 'styles/fonts/*']
-                }, {
-                    expand: true,
-                    cwd: '.tmp/images',
-                    dest: '<%= yeoman.dist %>/images',
-                    src: ['generated/*']
-                }]
-            },
-            styles: {
-                expand: true,
-                cwd: '<%= yeoman.app %>/styles',
-                dest: '.tmp/styles/',
-                src: '{,*/}*.css'
-            }
-        },
-        concurrent: {
-            server: ['coffee:dist', 'less', 'copy:styles'],
-            test: ['coffee', 'less', 'copy:styles'],
-            dist: ['coffee', 'less', 'copy:styles', 'imagemin', 'svgmin', 'htmlmin']
-        },
+        
+        
         karma: {
             unit: {
                 configFile: 'karma.conf.js',
@@ -261,7 +339,23 @@ module.exports = function(grunt) {
             return grunt.task.run(['build', 'env:dist', 'express:dist', 'express-keepalive']);
         };
 
-        grunt.task.run(['clean:server', 'concurrent:server', 'autoprefixer', 'env:dev', 'express:dev', 'open', 'watch']);
+        grunt.task.run([
+            'clean:server', 
+            'concurrent:copy',              // 'copy:themes', 'copy:common', 'copy:addon'
+            'concurrent:server',            // 'less:themes', 'less:common', 'less.addon'
+            'concat:themes',
+            'concat:common_styles',
+            'concat:common_scripts',
+            'concat:addon_styles',
+            'concat:addon_scripts',
+            'autoprefixer',
+            'env:dev', 
+            'express:dev', 
+            'open', 
+            'watch'
+        ]);
+
+        // grunt.task.run(['clean:server', 'concurrent:server', 'autoprefixer', 'concat', 'env:dev', 'express:dev', 'open', 'watch']);
     });
 
     grunt.registerTask('test', ['clean:server', 'concurrent:test', 'autoprefixer', 'connect:test', 'karma']);
