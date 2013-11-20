@@ -274,21 +274,29 @@ module.exports = function(grunt) {
             'express:dev', 
             'open', 
             'watch'                         
-            
-
-            'concurrent:copy'               'copy:themes', 'copy:styles', 'copy:common', 'copy:addon', 'less'
-            'concurrent:server',            'concat:themes', 'concat:styles', 'concat:scripts', 
-            'autoprefixer',
-            'concat',
-            'env:dev', 
-            'express:dev', 
-            'open', 
-            'watch']);
+        ]);
     });
 
     grunt.registerTask('test', ['clean:server', 'concurrent:test', 'autoprefixer', 'connect:test', 'karma']);
 
-    grunt.registerTask('build', ['clean:dist', 'useminPrepare', 'concurrent:dist', 'autoprefixer', 'concat', 'copy:dist', 'ngmin', 'cssmin', 'uglify', 'rev', 'usemin']);
+    grunt.registerTask('build', [
+        'clean:dist',
+        'copy:app',
+        'concurrent:copy',              // 'copy:themes', 'copy:common', 'copy:addon'
+        'concurrent:server',            // 'less:themes', 'less:common', 'less.addon'
+        'concat:themes',
+        'concat:common_styles',
+        'concat:common_scripts',
+        'concat:addon_styles',
+        'concat:addon_scripts',
+        'autoprefixer',
+        'copy:dist',
+
+        'useminPrepare',
+        'concurrent:dist',              // 'imagemin', 'svgmin', 'htmlmin', 'ngmin', 'cssmin'
+        'uglify',
+        'rev', 
+        'usemin']);
 
     grunt.registerTask('default', ['jshint', 'test', 'build']);
 };

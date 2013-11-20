@@ -54,24 +54,38 @@ module.exports = function(grunt) {
         concurrent: {
             copy: ['copy:themes', 'copy:common', 'copy:addon'],
             server: ['less:themes', 'less:common', 'less:addon'],
-            // test: ['coffee', 'less', 'copy:styles'],
-            // dist: ['coffee', 'less', 'copy:styles', 'imagemin', 'svgmin', 'htmlmin']
+            dist: ['less', 'copy:styles', 'imagemin', 'svgmin', 'htmlmin'],
+            // test: ['coffee', 'less', 'copy:styles']            
         },
         copy: {
-            // dist: {
-            //     files: [{
-            //         expand: true,
-            //         dot: true,
-            //         cwd: '<%= yeoman.app %>',
-            //         dest: '<%= yeoman.dist %>',
-            //         src: ['*.{ico,png,txt}', '.htaccess', 'bower_components/**/*', 'images/{,*/}*.{gif,webp}', 'styles/fonts/*']
-            //     }, {
-            //         expand: true,
-            //         cwd: '.tmp/images',
-            //         dest: '<%= yeoman.dist %>/images',
-            //         src: ['generated/*']
-            //     }]
-            // },
+            app: {
+                files: [{
+                    expand: true,
+                    dot: true,
+                    cwd: '<%= yeoman.app %>',
+                    src: ['*.{html,ico,png,txt}', '.htaccess', '{assets,bower_components}/**/*'],
+                    dest: '<%= yeoman.dist %>'                    
+                }, {
+                    expand: true,
+                    cwd: '<%= yeoman.app %>/<%= yeoman.addon %>',
+                    src: ['**/*', '!**/*.less', '!**/*.js', '!**/*.css'],
+                    dest: '<%= yeoman.dist %>'            
+                }, {
+                    expand: true,
+                    cwd: '<%= yeoman.app %>/<%= yeoman.common %>',
+                    src: ['**/*', '!**/*.less', '!**/*.js', '!**/*.css'],
+                    dest: '<%= yeoman.dist %>'            
+                }]
+            },
+            dist: {
+                files: [{
+                    expand: true,
+                    dot: true,
+                    cwd: '.tmp',
+                    src: ['**/*.*', '!**/.tmp'],
+                    dest: '<%= yeoman.dist %>' 
+                }]
+            },
             themes: {
                 files: [{
                     expand: true,
@@ -158,14 +172,14 @@ module.exports = function(grunt) {
         },
         autoprefixer: {
             options: ['last 1 version'],
-            // dist: {
-            //     files: [{
-            //         expand: true,
-            //         cwd: '.tmp/styles/',
-            //         src: '**/*.css',
-            //         dest: '.tmp/styles/'
-            //     }]
-            // }
+            dist: {
+                files: [{
+                    expand: true,
+                    cwd: '.tmp/styles/',
+                    src: '**/*.css',
+                    dest: '.tmp/styles/'
+                }]
+            }
         },
         env: {
             dev: {
@@ -360,7 +374,21 @@ module.exports = function(grunt) {
 
     grunt.registerTask('test', ['clean:server', 'concurrent:test', 'autoprefixer', 'connect:test', 'karma']);
 
-    grunt.registerTask('build', ['clean:dist', 'useminPrepare', 'concurrent:dist', 'autoprefixer', 'concat', 'copy:dist', 'ngmin', 'cssmin', 'uglify', 'rev', 'usemin']);
+    grunt.registerTask('build', [
+        'clean:dist',
+        'copy:app',
+        'concurrent:copy',              // 'copy:themes', 'copy:common', 'copy:addon'
+        'concurrent:server',            // 'less:themes', 'less:common', 'less.addon'
+        'concat:themes',
+        'concat:common_styles',
+        'concat:common_scripts',
+        'concat:addon_styles',
+        'concat:addon_scripts',
+        'autoprefixer',
+        'copy:dist'
+    ]);
+
+    // grunt.registerTask('build', ['clean:dist', 'useminPrepare', 'concurrent:dist', 'autoprefixer', 'concat', 'copy:dist', 'ngmin', 'cssmin', 'uglify', 'rev', 'usemin']);
 
     grunt.registerTask('default', ['jshint', 'test', 'build']);
 };
